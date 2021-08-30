@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     cube.width = 32;
     cube.height = 32;
 
-    const sprite = await loadImage("../image/neko.png");
+    const sprite = await loadImage("image/neko.png");
     const context = cube.getContext("2d");
 
     document.body.appendChild(cube);
