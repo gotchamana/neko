@@ -3,6 +3,7 @@
 import Animation from "./animation.js";
 import { loadImage, Point } from "./util.js";
 import { Neko, State } from "./neko.js";
+import nekoImage from "./neko-image.js";
 
 const mousePosition = new Point(16, 32);
 
@@ -90,13 +91,9 @@ const spriteAnimation = new Map([
 document.addEventListener("DOMContentLoaded", async () => {
     const neko = new Neko({ x: 0, y: 0, width: 32, height: 32 });
 
-    const cube = document.createElement("canvas");
-    cube.classList.add("neko");
-    cube.width = 32;
-    cube.height = 32;
-
-    const sprite = await loadImage("image/neko.png");
+    const cube = createCanvas();
     const context = cube.getContext("2d");
+    const sprite = await loadImage(nekoImage);
 
     document.body.appendChild(cube);
 
@@ -117,3 +114,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         requestAnimationFrame(update);
     });
 });
+
+function createCanvas() {
+    const cube = document.createElement("canvas");
+
+    cube.style.position = "absolute";
+    cube.style.top = "0";
+    cube.style.left = "0";
+    cube.style.width = "32px";
+    cube.style.height = "32px";
+
+    cube.width = 32;
+    cube.height = 32;
+
+    return cube;
+}
