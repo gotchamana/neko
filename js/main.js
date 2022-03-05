@@ -88,32 +88,64 @@ const spriteAnimation = new Map([
     [State.YAWN, new Animation(1000, SpriteData.YAWN)]
 ]);
 
-document.addEventListener("DOMContentLoaded", async () => {
-    const neko = new Neko({ x: 0, y: 0, width: 32, height: 32 });
+const sprite = loadImage(nekoImage);
 
-    const cube = createCanvas();
-    const context = cube.getContext("2d");
-    const sprite = await loadImage(nekoImage);
+export class Oneko {
 
-    document.body.appendChild(cube);
+    #neko;
+    #cube;
+    #requestId;
 
-    requestAnimationFrame(function update(timeStamp) {
-        neko.moveTo(mousePosition.x, mousePosition.y);
-        neko.update(timeStamp);
+    constructor(x = 0, y = 0) {
+        this.#neko = new Neko({ x, y, width: 32, height: 32 });
 
-        cube.style.transform = `translate(${neko.x}px, ${neko.y}px)`;
+        this.#cube = createCanvas();
+        this.#cube.style.visibility = "hidden";
+        document.body.appendChild(this.#cube);
 
+        this.#requestId = requestAnimationFrame(this.#update.bind(this));
+    }
+
+    async #update(timeStamp) {
+        this.#neko.moveTo(mousePosition.x, mousePosition.y);
+        this.#neko.update(timeStamp);
+
+        this.#cube.style.transform = `translate(${this.#neko.x}px, ${this.#neko.y}px)`;
+
+        const context = this.#cube.getContext("2d");
         context.clearRect(0, 0, 32, 32);
 
-        const animation = spriteAnimation.get(neko.state);
+        const animation = spriteAnimation.get(this.#neko.state);
         animation.update(timeStamp);
 
         const { x, y } = animation.image;
-        context.drawImage(sprite, x, y, 32, 32, 0, 0, 32, 32);
+        context.drawImage(await sprite, x, y, 32, 32, 0, 0, 32, 32);
 
-        requestAnimationFrame(update);
-    });
-});
+        this.#requestId = requestAnimationFrame(this.#update.bind(this));
+    }
+
+    get position() {
+        return { x: this.#neko.x, y: this.#neko.y };
+    }
+
+    set position({ x, y }) {
+        this.#neko.x = x;
+        this.#neko.y = y;
+    }
+
+    show() {
+        this.#cube.style.visibility = "visible";
+    }
+
+    hide() {
+        this.#cube.style.visibility = "hidden";
+    }
+
+    destroy() {
+        this.#cube.remove();
+        cancelAnimationFrame(this.#requestId);
+    }
+}
 
 function createCanvas() {
     const cube = document.createElement("canvas");
